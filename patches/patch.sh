@@ -1,0 +1,1 @@
+awk '{print "patch -Np1 < patches/"$0; system("patch -Np1 < patches/"$0);}' patches/patches

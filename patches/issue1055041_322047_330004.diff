@@ -1,0 +1,151 @@
+Index: src/wifi/model/interference-helper.cc
+===================================================================
+--- a/src/wifi/model/interference-helper.cc
++++ b/src/wifi/model/interference-helper.cc
+@@ -215,12 +215,7 @@
+ double
+ InterferenceHelper::CalculateSnr (double signal, double noiseInterference, WifiMode mode) const
+ {
+-  // thermal noise at 290K in J/s = W
+-  static const double BOLTZMANN = 1.3803e-23;
+-  // Nt is the power of thermal noise in W
+-  double Nt = BOLTZMANN * 290.0 * mode.GetBandwidth ();
+-  // receiver noise Floor (W) which accounts for thermal noise and non-idealities of the receiver
+-  double noiseFloor = m_noiseFigure * Nt;
++  double noiseFloor = CalculateNoiseFloor (mode);
+   double noise = noiseFloor + noiseInterference;
+   double snr = signal / noise;
+   return snr;
+@@ -344,6 +339,113 @@
+   return per;
+ }
+ 
++double
++InterferenceHelper::CalculateNoiseFloor (WifiMode mode) const
++{
++  // thermal noise at 290K in J/s = W
++  static const double BOLTZMANN = 1.3803e-23;
++  // Nt is the power of thermal noise in W
++  double Nt = BOLTZMANN * 290.0 * mode.GetBandwidth ();
++  /*
++   * Receiver noise Floor (W) which accounts for thermal noise and non-
++   * idealities of the receiver.
++   */
++  return m_noiseFigure * Nt;
++}
++
++double
++InterferenceHelper::CalculatePacketRss (Ptr<const InterferenceHelper::Event> event,
++                                        NiChanges *ni) const
++{
++  double rss = 0;
++  double packetRss = 0;
++
++  NiChanges::iterator j = ni->begin ();
++  Time previous = (*j).GetTime ();
++  WifiMode payloadMode = event->GetPayloadMode ();
++  WifiPreamble preamble = event->GetPreambleType ();
++  WifiMode headerMode = WifiPhy::GetPlcpHeaderMode (payloadMode, preamble);
++  Time plcpHeaderStart = (*j).GetTime () + MicroSeconds (WifiPhy::GetPlcpPreambleDurationMicroSeconds (payloadMode, preamble));
++  Time plcpPayloadStart = plcpHeaderStart + MicroSeconds (WifiPhy::GetPlcpHeaderDurationMicroSeconds (payloadMode, preamble));
++  double powerW = event->GetRxPowerW ();  // power of packet at receiver
++  double noiseInterferenceW = (*j).GetDelta ();
++
++  j++;
++  while (ni->end () != j)
++    {
++      Time current = (*j).GetTime ();
++      NS_ASSERT (current >= previous);
++
++      // payload only
++      if (previous >= plcpPayloadStart)
++        {
++          rss = powerW + noiseInterferenceW + CalculateNoiseFloor (payloadMode);
++          packetRss += rss * (current - previous).GetSeconds ();
++        }
++      else if (previous >= plcpHeaderStart)
++        {
++          // half header half payload
++          if (current >= plcpPayloadStart)
++            {
++              // header chunk
++              rss = powerW + noiseInterferenceW + CalculateNoiseFloor (headerMode);
++              packetRss += rss * (plcpPayloadStart - previous).GetSeconds ();
++              // payload chunk
++              rss = powerW + noiseInterferenceW + CalculateNoiseFloor (payloadMode);
++              packetRss += rss * (current - plcpPayloadStart).GetSeconds ();
++            }
++          // header only
++          else
++            {
++              NS_ASSERT (current >= plcpHeaderStart);
++              rss = powerW + noiseInterferenceW + CalculateNoiseFloor (headerMode);
++              packetRss += rss * (current - previous).GetSeconds ();
++            }
++        }
++      else
++        {
++          // half header half payload
++          if (current >= plcpPayloadStart)
++            {
++              // header chunk
++              rss = powerW + noiseInterferenceW + CalculateNoiseFloor (headerMode);
++              packetRss += rss * (plcpPayloadStart - plcpHeaderStart).GetSeconds ();
++              // payload chunk
++              rss = powerW + noiseInterferenceW + CalculateNoiseFloor (payloadMode);
++              packetRss += rss * (current - plcpPayloadStart).GetSeconds ();
++            }
++          // header only
++          else if (current >= plcpHeaderStart)
++            {
++              rss = powerW + noiseInterferenceW + CalculateNoiseFloor (headerMode);
++              packetRss += rss * (current - plcpHeaderStart).GetSeconds ();
++            }
++        }
++
++      noiseInterferenceW += (*j).GetDelta ();
++      previous = current;
++      j++;
++    }
++
++  NS_ASSERT (event->GetDuration ().GetSeconds () != 0);
++  // real duration = time stamp of (last ni change - start of header)
++  Time duration = (ni->back()).GetTime () - plcpHeaderStart;
++  packetRss /= duration.GetSeconds ();
++  return packetRss;
++}
++
++double
++InterferenceHelper::CurrentNodeRss (WifiMode mode)
++{
++  double rss = CalculateNoiseFloor (mode);
++  Time now = Simulator::Now ();
++  NiChanges::iterator nowIterator = GetPosition (now);
++  for (NiChanges::iterator i = m_niChanges.begin (); i != nowIterator; i++)
++    {
++      rss += i->GetDelta ();
++    }
++  return rss;
++}
+ 
+ struct InterferenceHelper::SnrPer
+ InterferenceHelper::CalculateSnrPer (Ptr<InterferenceHelper::Event> event)
+@@ -354,7 +456,8 @@
+                              noiseInterferenceW,
+                              event->GetPayloadMode ());
+ 
+-  /* calculate the SNIR at the start of the packet and accumulate
++  /*
++   * calculate the SNIR at the start of the packet and accumulate
+    * all SNIR changes in the snir vector.
+    */
+   double per = CalculatePer (event, &ni);
+@@ -362,6 +465,8 @@
+   struct SnrPer snrPer;
+   snrPer.snr = snr;
+   snrPer.per = per;
++  snrPer.packetRss = CalculatePacketRss (event, &ni);
++
+   return snrPer;
+ }
+ 

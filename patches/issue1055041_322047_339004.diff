@@ -1,0 +1,22 @@
+Index: src/wifi/model/wifi-preamble.h
+===================================================================
+--- a/src/wifi/model/wifi-preamble.h
++++ b/src/wifi/model/wifi-preamble.h
+@@ -16,6 +16,7 @@
+  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  *
+  * Author: Mathieu Lacage <mathieu.lacage@sophia.inria.fr>
++ *         Sidharth Nabar <snabar@uw.edu>, He Wu <mdzz@u.washington.edu>
+  */
+ #ifndef WIFI_PREAMBLE_H
+ #define WIFI_PREAMBLE_H
+@@ -29,7 +30,8 @@
+ enum WifiPreamble
+ {
+   WIFI_PREAMBLE_LONG,
+-  WIFI_PREAMBLE_SHORT
++  WIFI_PREAMBLE_SHORT,
++  WIFI_PREAMBLE_INVALID	// PHY layer preamble for jammer "packets"
+ };
+ 
+ } // namespace ns3

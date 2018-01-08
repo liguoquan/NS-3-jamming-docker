@@ -1,0 +1,10 @@
+--- a/src/wscript	2018-01-06 20:22:38.041548000 +0800
++++ b/src/wscript	2018-01-07 19:32:11.533321872 +0800
+@@ -60,6 +60,7 @@
+     'point-to-point-layout',
+     'csma-layout',
+     'template',
++    'jamming',
+     )
+ 
+ def set_options(opt):

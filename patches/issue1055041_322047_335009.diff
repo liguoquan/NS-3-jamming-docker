@@ -1,0 +1,60 @@
+Index: src/wifi/model/interference-helper.h
+===================================================================
+--- a/src/wifi/model/interference-helper.h
++++ b/src/wifi/model/interference-helper.h
+@@ -67,6 +67,12 @@
+   {
+     double snr;
+     double per;
++    /*
++     * Average RSS of the entire packet, used for jamming detection. In the
++     * case of detecting a reactive jammer. The average RSS value is compared
++     * to the initial RSS value.
++     */
++    double packetRss;
+   };
+ 
+   InterferenceHelper ();
+@@ -95,7 +101,18 @@
+   struct InterferenceHelper::SnrPer CalculateSnrPer (Ptr<InterferenceHelper::Event> event);
+   void NotifyRxStart ();
+   void NotifyRxEnd ();
+-  void EraseEvents (void);
++  void EraseEvents (void); 
++
++  /**
++   * \brief Get current node Received Signal Strength.
++   * \param mode WifiMode.
++   * \returns current RSS value (W).
++   *
++   * This function calculates the current RSS value at the node. Current RSS at
++   * node is given by accumulating all signal present at node and noise floor.
++   */
++  double CurrentNodeRss (WifiMode mode);
++
+ private:
+   class NiChange
+   {
+@@ -118,6 +135,22 @@
+   double CalculateSnr (double signal, double noiseInterference, WifiMode mode) const;
+   double CalculateChunkSuccessRate (double snir, Time delay, WifiMode mode) const;
+   double CalculatePer (Ptr<const Event> event, NiChanges *ni) const;
++  /**
++   * \brief Calculate noise floor.
++   * \param mode Wifi mode.
++   * \returns Noise floor (W).
++   */
++  double CalculateNoiseFloor (WifiMode mode) const;
++  /**
++   * \brief This function calculate average RSS of a packet.
++   * \param event EndSync event of the packet.
++   * \param ni list of interference changes.
++   * \returns average RSS over the entire packet.
++   *
++   * This function goes over all interference events over the entire packet and
++   * calculates a time weighted RSS value.
++   */
++  double CalculatePacketRss (Ptr<const Event> event, NiChanges *ni) const;
+ 
+   double m_noiseFigure; /**< noise figure (linear) */
+   Ptr<ErrorRateModel> m_errorRateModel;

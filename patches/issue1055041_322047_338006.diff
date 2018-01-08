@@ -1,0 +1,12 @@
+Index: src/wifi/wscript
+===================================================================
+--- a/src/wifi/wscript
++++ b/src/wifi/wscript
+@@ -132,6 +132,7 @@
+         'model/block-ack-agreement.h',
+         'model/block-ack-manager.h',
+         'model/block-ack-cache.h',
++				'model/wifi-phy-state-helper.h',
+         'helper/athstats-helper.h',
+         'helper/wifi-helper.h',
+         'helper/yans-wifi-helper.h',
