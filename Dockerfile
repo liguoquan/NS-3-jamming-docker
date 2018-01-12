@@ -1,7 +1,14 @@
 FROM ubuntu:12.04
 
 RUN apt-get update && \
-    apt-get install -y patch vim wget bzip2 python-dev python-pip gcc-4.5 g++-4.5 && \
+    apt-get install -y patch vim wget bzip2 \
+        python-dev python-pip \
+        gcc-4.5 g++-4.5 \
+        gdb valgrind \
+        mercurial \
+        sqlite sqlite3 libsqlite3-dev \ 
+        tcpdump \
+        libboost-signals-dev libboost-filesystem-dev && \
     cd /usr/bin && \
     ln -s g++-4.5 g++ && \
     ln -s gcc-4.5 gcc && \
