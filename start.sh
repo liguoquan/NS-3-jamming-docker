@@ -1,7 +1,7 @@
 sudo docker run -i -t \
   -v "${PWD}/scratch:/root/ns-allinone-3.11/ns-3.11/scratch" \
   -w /root/ns-allinone-3.11/ns-3.11 \
-  ns-3:jamming \
+  ns-3-jamming \
   /bin/bash
 
 USER_NAME=${SUDO_USER:=$USER}
