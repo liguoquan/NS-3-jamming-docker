@@ -27,8 +27,8 @@ NS_LOG_COMPONENT_DEFINE ("FirstScriptExample");
 int
 main (int argc, char *argv[])
 {
-  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_ALL);
+  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_ALL);
 
   NodeContainer nodes;
   nodes.Create (2);
@@ -55,14 +55,20 @@ main (int argc, char *argv[])
   serverApps.Stop (Seconds (10.0));
 
   UdpEchoClientHelper echoClient (interfaces.GetAddress (1), 9);
-  echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (2));
   echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
 
-  ApplicationContainer clientApps = echoClient.Install (nodes.Get (0));
-  clientApps.Start (Seconds (2.0));
-  clientApps.Stop (Seconds (10.0));
+  ApplicationContainer clientApps; 
+  for(int i=2;i<8;i=i+2){
+    clientApps = echoClient.Install (nodes.Get (0));
+    clientApps.Start (Seconds (i));
+    clientApps.Stop (Seconds (i+1));
+  }
 
+  AsciiTraceHelper ascii;
+  pointToPoint.EnableAsciiAll(ascii.CreateFileStream("test.txt"));
+  pointToPoint.EnablePcapAll("test.pcap");
   Simulator::Run ();
   Simulator::Destroy ();
   return 0;
