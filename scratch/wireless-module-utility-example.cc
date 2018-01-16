@@ -40,7 +40,7 @@
 #include <vector>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE ("WirelessModuleUtilityExample");
+NS_LOG_COMPONENT_DEFINE("WirelessModuleUtilityExample");
 
 using namespace ns3;
 
@@ -49,21 +49,17 @@ using namespace ns3;
  *
  * \param socket Pointer to socket.
  */
-void
-ReceivePacket (Ptr<Socket> socket)
-{
+void ReceivePacket (Ptr<Socket> socket){
   Ptr<Packet> packet;
   Address from;
-  while (packet = socket->RecvFrom (from))
-    {
-      if (packet->GetSize () > 0)
-        {
-          InetSocketAddress iaddr = InetSocketAddress::ConvertFrom (from);
-          NS_LOG_UNCOND ("--\nReceived one packet! Socket: "<< iaddr.GetIpv4 ()
-                         << " port: " << iaddr.GetPort () << " at time = " <<
-                         Simulator::Now ().GetSeconds () << "\n--");
-        }
+  while(packet = socket->RecvFrom (from)){
+    if (packet->GetSize () > 0){
+      InetSocketAddress iaddr = InetSocketAddress::ConvertFrom (from);
+      NS_LOG_UNCOND ("--\nReceived one packet! Socket: "<< iaddr.GetIpv4 ()
+                        << " port: " << iaddr.GetPort () << " at time = " <<
+                        Simulator::Now ().GetSeconds () << "\n--");
     }
+  }
 }
 
 /**
@@ -75,20 +71,15 @@ ReceivePacket (Ptr<Socket> socket)
  * \param pktCount Number of packets to generate.
  * \param pktInterval Packet sending interval.
  */
-static void
-GenerateTraffic (Ptr<Socket> socket, uint32_t pktSize, Ptr<Node> n,
-                 uint32_t pktCount, Time pktInterval)
-{
-  if (pktCount > 0)
-    {
-      socket->Send (Create<Packet> (pktSize));
-      Simulator::Schedule (pktInterval, &GenerateTraffic, socket, pktSize, n,
+static void GenerateTraffic (Ptr<Socket> socket, uint32_t pktSize, Ptr<Node> n,
+                 uint32_t pktCount, Time pktInterval){
+  if (pktCount > 0){
+    socket->Send (Create<Packet> (pktSize));
+    Simulator::Schedule (pktInterval, &GenerateTraffic, socket, pktSize, n,
           pktCount - 1, pktInterval);
-    }
-  else
-    {
-      socket->Close ();
-    }
+  }else{
+    socket->Close ();
+  }
 }
 
 /**
@@ -97,11 +88,8 @@ GenerateTraffic (Ptr<Socket> socket, uint32_t pktSize, Ptr<Node> n,
  * \param oldValue Old remaining energy value.
  * \param remainingEnergy New remaining energy value.
  */
-void
-RemainingEnergy (double oldValue, double remainingEnergy)
-{
-  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () <<
-                 "s Current remaining energy = " << remainingEnergy << "J");
+void RemainingEnergy (double oldValue, double remainingEnergy){
+  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Current remaining energy = " << remainingEnergy << "J");
 }
 
 /**
@@ -110,11 +98,8 @@ RemainingEnergy (double oldValue, double remainingEnergy)
  * \param oldValue Old total energy consumption value.
  * \param totalEnergy New total energy consumption value.
  */
-void
-TotalEnergy (double oldValue, double totalEnergy)
-{
-  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () <<
-                 "s Total energy consumed by radio = " << totalEnergy << "J");
+void TotalEnergy (double oldValue, double totalEnergy){
+  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () <<"s Total energy consumed by radio = " << totalEnergy << "J");
 }
 
 /**
@@ -123,11 +108,8 @@ TotalEnergy (double oldValue, double totalEnergy)
  * \param oldValue Old RSS value.
  * \param rss New RSS value.
  */
-void
-NodeRss (double oldValue, double rss)
-{
-  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Node RSS = " << rss <<
-                 "W");
+void NodeRss (double oldValue, double rss){
+  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Node RSS = " << rss << "W");
 }
 
 /**
@@ -136,9 +118,7 @@ NodeRss (double oldValue, double rss)
  * \param oldValue Old PDR value.
  * \param pdr New PDR value.
  */
-void
-NodePdr (double oldValue, double pdr)
-{
+void NodePdr (double oldValue, double pdr){
   NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Node PDR = " << pdr);
 }
 
@@ -148,16 +128,11 @@ NodePdr (double oldValue, double pdr)
  * \param oldValue Old RX throughput value.
  * \param rxThroughput New RX throughput value.
  */
-void
-NodeThroughputRx (double oldValue, double rxThroughput)
-{
-  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Node RX throughput = "
-      << rxThroughput);
+void NodeThroughputRx (double oldValue, double rxThroughput){
+  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Node RX throughput = " << rxThroughput);
 }
 
-int
-main (int argc, char *argv[])
-{
+int main (int argc, char *argv[]){
   /*
   LogComponentEnable ("NslWifiPhy", LOG_LEVEL_DEBUG);
   LogComponentEnable ("EnergySource", LOG_LEVEL_DEBUG);
@@ -217,10 +192,9 @@ main (int argc, char *argv[])
 
   // The below set of helpers will help us to put together the wifi NICs we want
   WifiHelper wifi;
-  if (verbose)
-    {
-      wifi.EnableLogComponents ();
-    }
+  if(verbose){
+    wifi.EnableLogComponents ();
+  }
   wifi.SetStandard (WIFI_PHY_STANDARD_80211b);
 
   /** Wifi PHY **/
@@ -327,22 +301,21 @@ main (int argc, char *argv[])
                                                   MakeCallback (&TotalEnergy));
   // wireless module utility
   Ptr<WirelessModuleUtility> utilityPtr = utilities.Get (2);
-  utilityPtr->TraceConnectWithoutContext ("Rss", MakeCallback (&NodeRss));
-  utilityPtr->TraceConnectWithoutContext ("Pdr", MakeCallback (&NodePdr));
-  utilityPtr->TraceConnectWithoutContext ("ThroughputRx",
-                                          MakeCallback (&NodeThroughputRx));
+  utilityPtr->TraceConnectWithoutContext("Rss", MakeCallback (&NodeRss));
+  utilityPtr->TraceConnectWithoutContext("Pdr", MakeCallback (&NodePdr));
+  utilityPtr->TraceConnectWithoutContext("ThroughputRx", MakeCallback (&NodeThroughputRx));
   /***************************************************************************/
 
 
   /** simulation setup **/
   // start traffic
-  Simulator::Schedule (Seconds (startTime), &GenerateTraffic, source,
+  Simulator::Schedule(Seconds(startTime), &GenerateTraffic, source,
                        PpacketSize, honestNodes.Get (0), numPackets,
                        interPacketInterval);
 
-  Simulator::Stop (Seconds (60.0));
-  Simulator::Run ();
-  Simulator::Destroy ();
+  Simulator::Stop(Seconds(60.0));
+  Simulator::Run();
+  Simulator::Destroy();
 
   return 0;
 }
