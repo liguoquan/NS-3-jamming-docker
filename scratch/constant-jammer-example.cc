@@ -40,9 +40,11 @@
 #include <vector>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE ("ReactiveJammerExample");
+NS_LOG_COMPONENT_DEFINE ("ConstantJammerExample");
 
 using namespace ns3;
+
+ofstream outfile;
 
 /**
  * \brief Packet receiving sink.
@@ -58,6 +60,7 @@ void ReceivePacket(Ptr<Socket> socket){
       NS_LOG_UNCOND("--\nReceived one packet! Socket: "<< iaddr.GetIpv4()
         << " port: " << iaddr.GetPort() << " at time = " <<
         Simulator::Now().GetSeconds() << "\n--");
+      outfile << Simulator::Now().GetSeconds() << " ip " << iaddr.GetIpv4() << " port " << iaddr.GetPort() << "\n";
     }
   }
 }
@@ -88,6 +91,7 @@ static void GenerateTraffic(Ptr<Socket> socket, uint32_t pktSize, Ptr<Node> n, u
  */
 void RemainingEnergy(double oldValue, double remainingEnergy){
   NS_LOG_UNCOND(Simulator::Now ().GetSeconds () << "s Current remaining energy = " << remainingEnergy << "J");
+  //outfile << ""
 }
 
 /**
@@ -108,6 +112,7 @@ void TotalEnergy(double oldValue, double totalEnergy){
  */
 void NodeRss(double oldValue, double rss){
   NS_LOG_UNCOND(Simulator::Now().GetSeconds() << "s Node RSS = " << rss << "W");
+  outfile << Simulator::Now().GetSeconds() << " RSS " << rss << "\n";
 }
 
 /**
@@ -118,6 +123,7 @@ void NodeRss(double oldValue, double rss){
  */
 void NodePdr(double oldValue, double pdr){
   NS_LOG_UNCOND(Simulator::Now().GetSeconds() << "s Node PDR = " << pdr);
+  outfile << Simulator::Now().GetSeconds() << " PDR " << pdr << "\n";
 }
 
 /**
@@ -145,6 +151,8 @@ int main (int argc, char *argv[]){
   LogComponentEnable ("JammingMitigation", LOG_LEVEL_DEBUG);
   LogComponentEnable ("MitigateByChannelHop", LOG_LEVEL_DEBUG);
    */
+
+  outfile.open("constant.log",ios::trunc);
 
   std::string phyMode("DsssRate1Mbps");
   double Prss = -80;            // dBm
@@ -236,7 +244,7 @@ int main (int argc, char *argv[]){
   positionAlloc->Add(Vector(distanceToRx, 0.1 * distanceToRx, 0.0));
   positionAlloc->Add(Vector(2 * distanceToRx, 0.0, 0.0));
   positionAlloc->Add(Vector(3 * distanceToRx, 0.1 * distanceToRx, 0.0));
-  positionAlloc->Add(Vector(0.1* distanceToRx, -0.5 * distanceToRx, 0.0)); // jammer location
+  positionAlloc->Add(Vector(2 * distanceToRx, -0.5 * distanceToRx, 0.0)); // jammer location
   mobility.SetPositionAllocator(positionAlloc);
   mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
   mobility.Install(c);
@@ -277,12 +285,12 @@ int main (int argc, char *argv[]){
   /***************************************************************************/
   JammerHelper jammerHelper;
   // configure jammer type
-  jammerHelper.SetJammerType("ns3::ReactiveJammer");
+  //jammerHelper.SetJammerType("ns3:ConstantJammer");
   // set jammer parameters
-  jammerHelper.Set("ReactiveJammerRxTimeout", TimeValue(Seconds(2.0)));
-  jammerHelper.Set("ReactiveJammerReactionStrategy", UintegerValue(ReactiveJammer::FIXED_PROBABILITY));
+  // jammerHelper.Set("ConstantJammerRxTimeout", TimeValue(Seconds(2.0)));
+  // jammerHelper.Set("ConstantJammerReactionStrategy", UintegerValue(ConstantJammer::FIXED_PROBABILITY));
   // enable jammer reaction to jamming mitigation
-  jammerHelper.Set("ReactiveJammerReactToMitigation", UintegerValue(true));
+  // jammerHelper.Set("ConstantJammerReactToMitigation", UintegerValue(true));
   // install jammer
   JammerContainer jammers = jammerHelper.Install(c.Get(4));
   // Get pointer to Jammer
@@ -342,6 +350,8 @@ int main (int argc, char *argv[]){
   Simulator::Stop(Seconds(60.0));
   Simulator::Run();
   Simulator::Destroy();
+  
+  outfile.close();
 
   return 0;
 }
