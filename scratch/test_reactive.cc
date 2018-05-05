@@ -43,7 +43,9 @@
 NS_LOG_COMPONENT_DEFINE ("JammingMitigationExample");
 
 using namespace ns3;
-
+// reset RSS value
+double m_maxRssW = 0;
+double m_avgPktRssW = 0;
 /**
  * \brief Packet receiving sink.
  *
@@ -81,27 +83,6 @@ static void GenerateTraffic (Ptr<Socket> socket, uint32_t pktSize, Ptr<Node> n, 
   }
 }
 
-/**
- * \brief Trace function for remaining energy at node.
- *
- * \param oldValue Old remaining energy value.
- * \param remainingEnergy New remaining energy value.
- */
-void RemainingEnergy (double oldValue, double remainingEnergy){
-  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () <<
-                 "s Current remaining energy = " << remainingEnergy << "J");
-}
-
-/**
- * \brief Trace function for total energy consumption at node.
- *
- * \param oldValue Old total energy consumption value.
- * \param totalEnergy New total energy consumption value.
- */
-void TotalEnergy (double oldValue, double totalEnergy){
-  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () <<
-                 "s Total energy consumed by radio = " << totalEnergy << "J");
-}
 
 /**
  * \brief Trace function for node RSS.
@@ -109,8 +90,22 @@ void TotalEnergy (double oldValue, double totalEnergy){
  * \param oldValue Old RSS value.
  * \param rss New RSS value.
  */
-void NodeRss (double oldValue, double rss){
-  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Node RSS = " << rss << "W");
+void
+NodeRss (double oldValue, double rss)
+{
+  if (rss > m_maxRssW)
+    {
+      m_maxRssW = rss;
+    }
+}
+
+void
+PacketRss (double oldValue, double newValue)
+{
+  if (newValue > m_avgPktRssW)
+    {
+      m_avgPktRssW = newValue;
+    }
 }
 
 /**
@@ -123,34 +118,8 @@ void NodePdr (double oldValue, double pdr){
   NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Node PDR = " << pdr);
 }
 
-/**
- * \brief Trace function for node RX throughput.
- *
- * \param oldValue Old RX throughput value.
- * \param rxThroughput New RX throughput value.
- */
-void NodeThroughputRx (double oldValue, double rxThroughput){
-  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Node RX throughput = "
-      << rxThroughput);
-}
 
 int main (int argc, char *argv[]){
-  /*
-  LogComponentEnable ("NslWifiPhy", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("EnergySource", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("BasicEnergySource", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("DeviceEnergyModel", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("WifiRadioEnergyModel", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("WirelessModuleUtility", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("JammerHelper", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("Jammer", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("ReactiveJammer", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("JammingMitigationHelper", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("JammingMitigation", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("MitigateByChannelHop", LOG_LEVEL_DEBUG);
-  */
-
-  LogComponentEnable ("MitigateByChannelHop", LOG_LEVEL_DEBUG);
 
   std::string phyMode ("DsssRate1Mbps");
   double Prss = -80;            // dBm
@@ -192,13 +161,11 @@ int main (int argc, char *argv[]){
                       StringValue (phyMode));
 
   NodeContainer c;
-  c.Create (5);     // create 4 honest nodes + 1 jammer
+  c.Create (3);     // create 2 honest nodes + 1 jammer
   NodeContainer honestNodes;
   honestNodes.Add (c.Get (0));
   honestNodes.Add (c.Get (1));
-  honestNodes.Add (c.Get (2));
-  honestNodes.Add (c.Get (3));
-  NodeContainer jammerNodes (c.Get (4));
+  NodeContainer jammerNodes (c.Get (2));
 
   // The below set of helpers will help us to put together the wifi NICs we want
   WifiHelper wifi;
@@ -241,10 +208,8 @@ int main (int argc, char *argv[]){
   Ptr<ListPositionAllocator> positionAlloc =
       CreateObject<ListPositionAllocator> ();
   positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (distanceToRx, 0.1 * distanceToRx, 0.0));
-  positionAlloc->Add (Vector (2 * distanceToRx, 0.0, 0.0));
-  positionAlloc->Add (Vector (3 * distanceToRx, 0.1 * distanceToRx, 0.0));
-  positionAlloc->Add (Vector (2.9 * distanceToRx, 0.1 * distanceToRx, 0.0)); // jammer location
+  positionAlloc->Add (Vector (10, 0, 0.0));
+  positionAlloc->Add (Vector (5, 0, 0.0)); // jammer location
   mobility.SetPositionAllocator (positionAlloc);
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility.Install (c);
@@ -265,7 +230,7 @@ int main (int argc, char *argv[]){
   DeviceEnergyModelContainer deviceModels =
       radioEnergyHelper.Install (devices, energySources);
   DeviceEnergyModelContainer jammerDeviceModels =
-      radioEnergyHelper.Install (jammerNetdevice.Get (0), energySources.Get (4));
+      radioEnergyHelper.Install (jammerNetdevice.Get (0), energySources.Get (2));
   /***************************************************************************/
 
   /** WirelessModuleUtility **/
@@ -280,8 +245,24 @@ int main (int argc, char *argv[]){
   utilityHelper.SetInclusionList (AllInclusionList);
   utilityHelper.SetExclusionList (AllExclusionList);
   // install on all nodes
+  utilityHelper.Set ("RssUpdateInterval", TimeValue (MilliSeconds (100)));
   WirelessModuleUtilityContainer utilities = utilityHelper.InstallAll ();
+  Ptr<WirelessModuleUtility> utilSend = utilities.Get (0);
+  Ptr<WirelessModuleUtility> utilRecv = utilities.Get (1);
+  if ((utilSend == NULL) || (utilRecv == NULL)){
+    NS_LOG_UNCOND ("Failed to aggregate utility onto nodes!");
+    return true;
+  }
   /***************************************************************************/
+  //Callback<void, double, double> rssTraceCallback;
+  //rssTraceCallback = MakeCallback (&NodeRss, this);
+  //utilRecv->TraceConnectWithoutContext ("Rss", rssTraceCallback);
+  //Callback<void, double, double> packetRssTraceCallback;
+  //packetRssTraceCallback = MakeCallback (&PacketRss, this);
+  //utilRecv->TraceConnectWithoutContext ("PacketRss", packetRssTraceCallback);
+
+  utilRecv->TraceConnectWithoutContext ("Rss", MakeCallback (&NodeRss));
+  utilRecv->TraceConnectWithoutContext ("PacketRss", MakeCallback (&PacketRss));
 
   /** Jammer **/
   /***************************************************************************/
@@ -294,29 +275,13 @@ int main (int argc, char *argv[]){
   // enable jammer reaction to jamming mitigation
   jammerHelper.Set("ReactiveJammerReactToMitigation", UintegerValue(true));
   // install jammer
-  JammerContainer jammers = jammerHelper.Install(c.Get(4));
+  JammerContainer jammers = jammerHelper.Install(c.Get(2));
   // Get pointer to Jammer
   Ptr<Jammer> jammerPtr = jammers.Get(0);
   // enable all jammer debug statements
   if(verbose){
     jammerHelper.EnableLogComponents ();
   }
-  /***************************************************************************/
-
-  /** JammingMiigation **/
-  /***************************************************************************/
-  JammingMitigationHelper mitigationHelper;
-  // configure mitigation type
-  mitigationHelper.SetJammingMitigationType ("ns3::MitigateByChannelHop");
-  // configure mitigation parameters
-  mitigationHelper.Set ("MitigateByChannelHopChannelHopDelay",
-                        TimeValue (Seconds (0.0)));
-  mitigationHelper.Set ("MitigateByChannelHopDetectionMethod",
-                        UintegerValue (MitigateByChannelHop::PDR_AND_RSS));
-  // install mitigation on honest nodes
-  JammingMitigationContainer mitigators = mitigationHelper.Install (honestNodes);
-  // get pointer to mitigation object
-  Ptr<JammingMitigation> mitigationPtr = mitigators.Get (0);
   /***************************************************************************/
 
   /** Internet stack **/
@@ -329,7 +294,7 @@ int main (int argc, char *argv[]){
   Ipv4InterfaceContainer i = ipv4.Assign (devices);
 
   TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
-  Ptr<Socket> recvSink = Socket::CreateSocket (honestNodes.Get (3), tid);  // node 3, receiver
+  Ptr<Socket> recvSink = Socket::CreateSocket (honestNodes.Get (1), tid);  // node 3, receiver
   InetSocketAddress local = InetSocketAddress (Ipv4Address::GetAny (), 80);
   recvSink->Bind (local);
   recvSink->SetRecvCallback (MakeCallback (&ReceivePacket));
@@ -356,7 +321,6 @@ int main (int argc, char *argv[]){
   //utilityPtr->TraceConnectWithoutContext ("Pdr", MakeCallback (&NodePdr));
   /***************************************************************************/
 
-
   /** simulation setup **/
   // start traffic
   Simulator::Schedule (Seconds (startTime), &GenerateTraffic, source,
@@ -364,17 +328,17 @@ int main (int argc, char *argv[]){
                        interPacketInterval);
 
   // start jammer at 7.0 seconds
-  //Simulator::Schedule (Seconds (startTime + 7.0), &ns3::Jammer::StartJammer,
-  //                     jammerPtr);
-
-  // start jamming mitigation at 28.0 seconds
-  Simulator::Schedule (Seconds (startTime + 28.0),
-                       &ns3::JammingMitigation::StartMitigation,
-                       mitigationPtr);
+  Simulator::Schedule (Seconds (startTime + 7.0), &ns3::Jammer::StartJammer,
+                       jammerPtr);
 
   Simulator::Stop (Seconds (60.0));
   Simulator::Run ();
   Simulator::Destroy ();
 
+  double actualPdr = utilRecv->GetPdr (); // receiver
+  NS_LOG_UNCOND ("Actual PDR = " << actualPdr << "\n");
+  NS_LOG_UNCOND ("Actual MAX RSS = " << m_maxRssW << "\n");
+  NS_LOG_UNCOND ("Actual Average Packet RSS = " << m_avgPktRssW << "\n");
+  
   return 0;
 }

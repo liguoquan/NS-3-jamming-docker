@@ -137,20 +137,6 @@ void NodeThroughputRx(double oldValue, double rxThroughput){
 }
 
 int main (int argc, char *argv[]){
-  /*
-  LogComponentEnable ("NslWifiPhy", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("EnergySource", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("BasicEnergySource", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("DeviceEnergyModel", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("WifiRadioEnergyModel", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("WirelessModuleUtility", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("JammerHelper", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("Jammer", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("ReactiveJammer", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("JammingMitigationHelper", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("JammingMitigation", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("MitigateByChannelHop", LOG_LEVEL_DEBUG);
-   */
 
   outfile.open("constant.log",ios::trunc);
 
@@ -161,7 +147,7 @@ int main (int argc, char *argv[]){
 
   // simulation parameters
   uint32_t numPackets = 10000;  // number of packets to send
-  double interval = 1;          // seconds
+  double interval = 0.1;          // seconds
   double startTime = 0.0;       // seconds
   double distanceToRx = 10.0;   // meters
   /*
@@ -194,12 +180,10 @@ int main (int argc, char *argv[]){
                       StringValue (phyMode));
 
   NodeContainer c;
-  c.Create(5);     // create 4 nodes + 1 jammer
+  c.Create(2);     // create 4 nodes + 1 jammer
   NodeContainer networkNodes;
   networkNodes.Add(c.Get(0));
   networkNodes.Add(c.Get(1));
-  networkNodes.Add(c.Get(2));
-  networkNodes.Add(c.Get(3));
 
   // The below set of helpers will help us to put together the wifi NICs we want
   WifiHelper wifi;
@@ -235,16 +219,13 @@ int main (int argc, char *argv[]){
   /** install PHY + MAC **/
   NetDeviceContainer devices = wifi.Install(wifiPhy, wifiMac, networkNodes);
   // install MAC & PHY onto jammer
-  NetDeviceContainer jammerNetdevice = wifi.Install(wifiPhy, wifiMac, c.Get(4));
+  // NetDeviceContainer jammerNetdevice = wifi.Install(wifiPhy, wifiMac, c.Get(4));
 
   /** mobility **/
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator>();
   positionAlloc->Add(Vector(0.0, 0.0, 0.0));
-  positionAlloc->Add(Vector(distanceToRx, 0.1 * distanceToRx, 0.0));
-  positionAlloc->Add(Vector(2 * distanceToRx, 0.0, 0.0));
-  positionAlloc->Add(Vector(3 * distanceToRx, 0.1 * distanceToRx, 0.0));
-  positionAlloc->Add(Vector(2 * distanceToRx, -0.5 * distanceToRx, 0.0)); // jammer location
+  positionAlloc->Add(Vector(distanceToRx, 0, 0.0));
   mobility.SetPositionAllocator(positionAlloc);
   mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
   mobility.Install(c);
@@ -263,7 +244,7 @@ int main (int argc, char *argv[]){
   radioEnergyHelper.Set("TxCurrentA", DoubleValue(0.0174));
   // install on devices
   DeviceEnergyModelContainer deviceModels = radioEnergyHelper.Install(devices, energySources);
-  DeviceEnergyModelContainer jammerDeviceModels = radioEnergyHelper.Install(jammerNetdevice.Get(0), energySources.Get(4));
+  // DeviceEnergyModelContainer jammerDeviceModels = radioEnergyHelper.Install(jammerNetdevice.Get(0), energySources.Get(4));
   /***************************************************************************/
 
   /** WirelessModuleUtility **/
@@ -283,7 +264,7 @@ int main (int argc, char *argv[]){
 
   /** Jammer **/
   /***************************************************************************/
-  JammerHelper jammerHelper;
+  // JammerHelper jammerHelper;
   // configure jammer type
   //jammerHelper.SetJammerType("ns3:ConstantJammer");
   // set jammer parameters
@@ -292,15 +273,29 @@ int main (int argc, char *argv[]){
   // enable jammer reaction to jamming mitigation
   // jammerHelper.Set("ConstantJammerReactToMitigation", UintegerValue(true));
   // install jammer
-  JammerContainer jammers = jammerHelper.Install(c.Get(4));
+  // JammerContainer jammers = jammerHelper.Install(c.Get(4));
   // Get pointer to Jammer
-  Ptr<Jammer> jammerPtr = jammers.Get(0);
+  // Ptr<Jammer> jammerPtr = jammers.Get(0);
   // enable all jammer debug statements
-  if(verbose){
-    jammerHelper.EnableLogComponents ();
-  }
+  // if(verbose){
+  //  jammerHelper.EnableLogComponents ();
+  //}
   /***************************************************************************/
-
+  /** JammingMiigation **/
+  /***************************************************************************/
+  JammingMitigationHelper mitigationHelper;
+  // configure mitigation type
+  mitigationHelper.SetJammingMitigationType ("ns3::MitigateByChannelHop");
+  // configure mitigation parameters
+  mitigationHelper.Set ("MitigateByChannelHopChannelHopDelay",
+                        TimeValue (Seconds (0.0)));
+  mitigationHelper.Set ("MitigateByChannelHopDetectionMethod",
+                        UintegerValue (MitigateByChannelHop::PDR_AND_RSS));
+  // install mitigation on honest nodes
+  JammingMitigationContainer mitigators = mitigationHelper.Install (c.Get(1));
+  // get pointer to mitigation object
+  Ptr<JammingMitigation> mitigationPtr = mitigators.Get (0);
+  /***************************************************************************/
   /** Internet stack **/
   InternetStackHelper internet;
   internet.Install(networkNodes);
@@ -311,7 +306,7 @@ int main (int argc, char *argv[]){
   Ipv4InterfaceContainer i = ipv4.Assign (devices);
 
   TypeId tid = TypeId::LookupByName("ns3::UdpSocketFactory");
-  Ptr<Socket> recvSink = Socket::CreateSocket(networkNodes.Get(3), tid);  // node 3, receiver
+  Ptr<Socket> recvSink = Socket::CreateSocket(networkNodes.Get(1), tid);  // node 3, receiver
   InetSocketAddress local = InetSocketAddress(Ipv4Address::GetAny(), 80);
   recvSink->Bind(local);
   recvSink->SetRecvCallback(MakeCallback(&ReceivePacket));
@@ -325,15 +320,15 @@ int main (int argc, char *argv[]){
   /***************************************************************************/
   // all sources are connected to node 2
   // energy source
-  Ptr<EnergySource> basicSourcePtr = energySources.Get(2);
-  basicSourcePtr->TraceConnectWithoutContext("RemainingEnergy",MakeCallback(&RemainingEnergy));
+  //Ptr<EnergySource> basicSourcePtr = energySources.Get(1);
+  //basicSourcePtr->TraceConnectWithoutContext("RemainingEnergy",MakeCallback(&RemainingEnergy));
   // using honest node device energy model list
-  Ptr<DeviceEnergyModel> basicRadioModelPtr = deviceModels.Get(2);
-  basicRadioModelPtr->TraceConnectWithoutContext("TotalEnergyConsumption",MakeCallback (&TotalEnergy));
+  //Ptr<DeviceEnergyModel> basicRadioModelPtr = deviceModels.Get(1);
+  //basicRadioModelPtr->TraceConnectWithoutContext("TotalEnergyConsumption",MakeCallback (&TotalEnergy));
   // wireless module utility
-  Ptr<WirelessModuleUtility> utilityPtr = utilities.Get(2);
-  utilityPtr->TraceConnectWithoutContext("Rss", MakeCallback(&NodeRss));
-  utilityPtr->TraceConnectWithoutContext("Pdr", MakeCallback(&NodePdr));
+  //Ptr<WirelessModuleUtility> utilityPtr = utilities.Get(1);
+  //utilityPtr->TraceConnectWithoutContext("Rss", MakeCallback(&NodeRss));
+  //utilityPtr->TraceConnectWithoutContext("Pdr", MakeCallback(&NodePdr));
   /***************************************************************************/
 
 
@@ -344,8 +339,11 @@ int main (int argc, char *argv[]){
                        interPacketInterval);
 
   // start jammer at 7.0 seconds
-  Simulator::Schedule(Seconds(startTime + 7.0), &ns3::Jammer::StartJammer,
-                       jammerPtr);
+  //Simulator::Schedule(Seconds(startTime + 7.0), &ns3::Jammer::StartJammer,
+  //                     jammerPtr);
+  Simulator::Schedule (Seconds (startTime),
+                       &ns3::JammingMitigation::StartMitigation,
+                       mitigationPtr);
 
   Simulator::Stop(Seconds(60.0));
   Simulator::Run();
