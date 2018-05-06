@@ -40,12 +40,15 @@
 #include <vector>
 #include <string>
 
-NS_LOG_COMPONENT_DEFINE ("JammingMitigationExample");
+NS_LOG_COMPONENT_DEFINE ("ReactiveJamming");
 
 using namespace ns3;
 // reset RSS value
 double m_maxRssW = 0;
 double m_avgPktRssW = 0;
+
+ofstream outfile;
+
 /**
  * \brief Packet receiving sink.
  *
@@ -57,9 +60,12 @@ void ReceivePacket (Ptr<Socket> socket){
   while (packet = socket->RecvFrom (from)){
     if (packet->GetSize () > 0){
       InetSocketAddress iaddr = InetSocketAddress::ConvertFrom (from);
-      NS_LOG_UNCOND ("--\nReceived one packet! Socket: "<< iaddr.GetIpv4 ()
+      //NS_LOG_UNCOND ("--\nReceived one packet! Socket: "<< iaddr.GetIpv4 ()
+      //                   << " port: " << iaddr.GetPort () << " at time = " <<
+      //                   Simulator::Now ().GetSeconds () << "\n--");
+      outfile << "--\nReceived one packet! Socket: "<< iaddr.GetIpv4 ()
                          << " port: " << iaddr.GetPort () << " at time = " <<
-                         Simulator::Now ().GetSeconds () << "\n--");
+                         Simulator::Now ().GetSeconds () << "\n--\n";
     }
   }
 }
@@ -93,6 +99,8 @@ static void GenerateTraffic (Ptr<Socket> socket, uint32_t pktSize, Ptr<Node> n, 
 void
 NodeRss (double oldValue, double rss)
 {
+  //NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Node RSS = " << rss);
+  outfile << Simulator::Now().GetSeconds() << " RSS " << rss << "\n";
   if (rss > m_maxRssW)
     {
       m_maxRssW = rss;
@@ -102,35 +110,40 @@ NodeRss (double oldValue, double rss)
 void
 PacketRss (double oldValue, double newValue)
 {
+  //NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Node PRSS = " << newValue);
+  outfile << Simulator::Now().GetSeconds() << " PRSS " << newValue << "\n";
   if (newValue > m_avgPktRssW)
     {
       m_avgPktRssW = newValue;
     }
 }
-
 /**
  * \brief Trace function for node PDR.
  *
  * \param oldValue Old PDR value.
  * \param pdr New PDR value.
  */
-void NodePdr (double oldValue, double pdr){
-  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Node PDR = " << pdr);
-}
+//void NodePdr (double oldValue, double pdr){
+//  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "s Node PDR = " << pdr);
+//}
 
 
 int main (int argc, char *argv[]){
+
+  outfile.open("reactive.log",ios::trunc);
 
   std::string phyMode ("DsssRate1Mbps");
   double Prss = -80;            // dBm
   uint32_t PpacketSize = 200;   // bytes
   bool verbose = false;
+  bool display = true;
 
   // simulation parameters
-  uint32_t numPackets = 10000;  // number of packets to send
+  uint32_t numPackets = 1000000;  // number of packets to send
   double interval = 1;          // seconds
   double startTime = 0.0;       // seconds
   double distanceToRx = 10.0;   // meters
+  double disy = 0;
   /*
    * This is a magic number used to set the transmit power, based on other
    * configuration.
@@ -145,6 +158,9 @@ int main (int argc, char *argv[]){
   cmd.AddValue ("startTime", "Simulation start time", startTime);
   cmd.AddValue ("distanceToRx", "X-Axis distance between nodes", distanceToRx);
   cmd.AddValue ("verbose", "Turn on all device log components", verbose);
+  cmd.AddValue ("interval", "interval", interval);
+  cmd.AddValue ("disy", "disy", disy);
+  cmd.AddValue ("display", "display", display);
   cmd.Parse (argc, argv);
 
   // Convert to time object
@@ -208,8 +224,8 @@ int main (int argc, char *argv[]){
   Ptr<ListPositionAllocator> positionAlloc =
       CreateObject<ListPositionAllocator> ();
   positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (10, 0, 0.0));
-  positionAlloc->Add (Vector (5, 0, 0.0)); // jammer location
+  positionAlloc->Add (Vector (distanceToRx, 0, 0.0));
+  positionAlloc->Add (Vector (distanceToRx*0.5, disy, 0.0)); // jammer location
   mobility.SetPositionAllocator (positionAlloc);
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility.Install (c);
@@ -328,7 +344,7 @@ int main (int argc, char *argv[]){
                        interPacketInterval);
 
   // start jammer at 7.0 seconds
-  Simulator::Schedule (Seconds (startTime + 7.0), &ns3::Jammer::StartJammer,
+  Simulator::Schedule (Seconds (startTime), &ns3::Jammer::StartJammer,
                        jammerPtr);
 
   Simulator::Stop (Seconds (60.0));
@@ -336,9 +352,16 @@ int main (int argc, char *argv[]){
   Simulator::Destroy ();
 
   double actualPdr = utilRecv->GetPdr (); // receiver
-  NS_LOG_UNCOND ("Actual PDR = " << actualPdr << "\n");
-  NS_LOG_UNCOND ("Actual MAX RSS = " << m_maxRssW << "\n");
-  NS_LOG_UNCOND ("Actual Average Packet RSS = " << m_avgPktRssW << "\n");
+  if(display){
+    NS_LOG_UNCOND ("Actual PDR = " << actualPdr);
+    NS_LOG_UNCOND ("Actual MAX RSS = " << m_maxRssW);
+    NS_LOG_UNCOND ("Actual Average Packet RSS = " << m_avgPktRssW);
+  }
   
+  outfile << "Actual PDR = " << actualPdr << "\n";
+  outfile << "Actual RSS = " << m_maxRssW << "\n";
+  outfile << "Actual Average Packet RSS = " << m_avgPktRssW << "\n";
+
+  outfile.close();
   return 0;
 }
