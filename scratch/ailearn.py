@@ -1,11 +1,13 @@
+from sklearn import datasets
 
-
-data = []
-label = []
+iris = datasets.load_iris()
+data = iris.data[:, [0, 2]]
+label = iris.target
+#data = []
+#label = []
 
 from sklearn.model_selection import train_test_split
-data_train, label_train, data_test, label_test = train_test_split(data, label, test_size=0.3)
-
+data_train,  data_test, label_train, label_test = train_test_split(data, label, test_size=0.3, random_state=0)
 from sklearn.metrics import accuracy_score
 from sklearn.externals import joblib
 
