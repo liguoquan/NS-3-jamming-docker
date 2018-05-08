@@ -143,6 +143,7 @@ int main (int argc, char *argv[]){
   double interval = 1;          // seconds
   double startTime = 0.0;       // seconds
   double distanceToRx = 10.0;   // meters
+  double disx = 0;
   double disy = 0;
   /*
    * This is a magic number used to set the transmit power, based on other
@@ -159,6 +160,7 @@ int main (int argc, char *argv[]){
   cmd.AddValue ("distanceToRx", "X-Axis distance between nodes", distanceToRx);
   cmd.AddValue ("verbose", "Turn on all device log components", verbose);
   cmd.AddValue ("interval", "interval", interval);
+  cmd.AddValue ("disx", "disx", disx);
   cmd.AddValue ("disy", "disy", disy);
   cmd.AddValue ("display", "display", display);
   cmd.Parse (argc, argv);
@@ -200,7 +202,8 @@ int main (int argc, char *argv[]){
 
   /** wifi channel **/
   NslWifiChannelHelper wifiChannel;
-  wifiChannel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
+  //wifiChannel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
+  wifiChannel.SetPropagationDelay ("ns3::RandomPropagationDelayModel","Variable", RandomVariableValue (UniformVariable (0.0, 0.005)));
   wifiChannel.AddPropagationLoss ("ns3::FriisPropagationLossModel");
   // create wifi channel
   Ptr<NslWifiChannel> wifiChannelPtr = wifiChannel.Create ();
@@ -219,13 +222,18 @@ int main (int argc, char *argv[]){
   // install MAC & PHY onto jammer
   NetDeviceContainer jammerNetdevice = wifi.Install (wifiPhy, wifiMac, jammerNodes);
 
+
+  if((disx==distanceToRx)&&(disy==0)){
+    disx=distanceToRx*0.5;
+    disy=0;
+  }
   /** mobility **/
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> positionAlloc =
       CreateObject<ListPositionAllocator> ();
   positionAlloc->Add (Vector (0.0, 0.0, 0.0));
   positionAlloc->Add (Vector (distanceToRx, 0, 0.0));
-  positionAlloc->Add (Vector (distanceToRx*0.5, disy, 0.0)); // jammer location
+  positionAlloc->Add (Vector (disx, disy, 0.0)); // jammer location
   mobility.SetPositionAllocator (positionAlloc);
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility.Install (c);
@@ -289,7 +297,7 @@ int main (int argc, char *argv[]){
   jammerHelper.Set("ReactiveJammerRxTimeout", TimeValue(Seconds(2.0)));
   jammerHelper.Set("ReactiveJammerReactionStrategy", UintegerValue(ReactiveJammer::FIXED_PROBABILITY));
   // enable jammer reaction to jamming mitigation
-  jammerHelper.Set("ReactiveJammerReactToMitigation", UintegerValue(true));
+  // jammerHelper.Set("ReactiveJammerReactToMitigation", UintegerValue(true));
   // install jammer
   JammerContainer jammers = jammerHelper.Install(c.Get(2));
   // Get pointer to Jammer

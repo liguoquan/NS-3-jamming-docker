@@ -1,0 +1,385 @@
+0 RSS 4.41361e-13
+0.00186476 RSS 1.08254e-09
+0.00416876 RSS 4.41361e-13
+0.00416876 PRSS 2.18673e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 0.00416876
+--
+0.204169 RSS -1.10374e-09
+0.504169 RSS 1.10463e-09
+0.704169 RSS 4.41361e-13
+0.904169 RSS 1.10463e-09
+1.0057 RSS 1.08254e-09
+1.008 RSS 4.41361e-13
+1.008 PRSS 1.08254e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 1.008
+--
+1.308 RSS 1.10463e-09
+1.508 RSS 4.41361e-13
+1.608 RSS 1.10463e-09
+1.808 RSS 4.41361e-13
+2.00055 RSS 1.08254e-09
+2.00285 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 2.00285
+--
+2.10285 RSS 1.10463e-09
+2.30285 RSS 4.41361e-13
+2.50285 RSS 1.10463e-09
+2.70285 RSS 4.41361e-13
+2.90285 RSS 1.10463e-09
+3.00685 RSS 1.08254e-09
+3.00916 RSS -1.10374e-09
+3.00916 PRSS 1.65454e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 3.00916
+--
+3.20916 RSS 1.10463e-09
+3.40916 RSS 4.41361e-13
+3.60916 RSS 1.10463e-09
+3.80916 RSS 4.41361e-13
+4.00426 RSS 1.08254e-09
+4.00656 RSS 4.41361e-13
+4.00656 PRSS 1.08254e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 4.00656
+--
+4.10656 RSS 1.10463e-09
+4.30656 RSS 4.41361e-13
+4.50656 RSS 1.10463e-09
+4.70656 RSS 4.41361e-13
+4.90656 RSS 1.10463e-09
+5.00528 RSS 1.08254e-09
+5.00758 RSS 4.41361e-13
+5.00758 PRSS 2.18673e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 5.00758
+--
+5.10758 RSS -1.10374e-09
+5.30758 RSS 1.10463e-09
+5.50758 RSS 4.41361e-13
+5.70758 RSS 1.10463e-09
+5.90758 RSS 4.41361e-13
+6.00433 RSS 1.08254e-09
+6.00663 RSS 4.41361e-13
+6.00663 PRSS 1.08254e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 6.00663
+--
+7.00161 RSS 1.08254e-09
+7.00392 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 7.00392
+--
+8.00542 RSS 1.08254e-09
+8.00772 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 8.00772
+--
+9.00095 RSS 1.08254e-09
+9.00325 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 9.00325
+--
+10.01 RSS 1.08254e-09
+10.0123 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 10.0123
+--
+11.0021 RSS 1.08254e-09
+11.0044 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 11.0044
+--
+12.0014 RSS 1.08254e-09
+12.0037 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 12.0037
+--
+13.0041 RSS 1.08254e-09
+13.0064 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 13.0064
+--
+14 RSS 1.08254e-09
+14.0023 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 14.0023
+--
+15.0078 RSS 1.08254e-09
+15.0101 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 15.0101
+--
+16.0094 RSS 1.08254e-09
+16.0117 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 16.0117
+--
+17.0038 RSS 1.08254e-09
+17.0061 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 17.0061
+--
+18.0041 RSS 1.08254e-09
+18.0064 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 18.0064
+--
+19.0013 RSS 1.08254e-09
+19.0036 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 19.0036
+--
+20.0099 RSS 1.08254e-09
+20.0122 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 20.0122
+--
+21.0006 RSS 1.08254e-09
+21.0029 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 21.0029
+--
+22.0029 RSS 1.08254e-09
+22.0053 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 22.0053
+--
+23.0098 RSS 1.08254e-09
+23.0121 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 23.0121
+--
+24.0081 RSS 1.08254e-09
+24.0104 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 24.0104
+--
+24.1104 RSS 1.10463e-09
+24.3104 RSS 4.41361e-13
+24.5104 RSS 1.10463e-09
+24.7104 RSS 4.41361e-13
+24.9104 RSS 1.10463e-09
+25.0021 RSS 1.08254e-09
+25.0044 RSS 4.41361e-13
+25.0044 PRSS 2.18673e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 25.0044
+--
+25.1044 RSS -1.10374e-09
+25.3044 RSS 1.10463e-09
+25.5044 RSS 4.41361e-13
+25.7044 RSS 1.10463e-09
+25.9044 RSS 4.41361e-13
+26.0073 RSS 1.08254e-09
+26.0096 RSS 4.41361e-13
+26.0096 PRSS 1.08254e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 26.0096
+--
+26.1096 RSS 1.10463e-09
+26.3096 RSS 4.41361e-13
+26.5096 RSS 1.10463e-09
+26.7096 RSS 4.41361e-13
+26.9096 RSS 1.10463e-09
+27.0057 RSS 1.08254e-09
+27.008 RSS 4.41361e-13
+27.008 PRSS 2.18673e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 27.008
+--
+27.108 RSS -1.10374e-09
+27.308 RSS 1.10463e-09
+27.508 RSS 4.41361e-13
+27.708 RSS 1.10463e-09
+27.908 RSS 4.41361e-13
+28.0076 RSS 1.08254e-09
+28.0099 RSS 4.41361e-13
+28.0099 PRSS 1.08254e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 28.0099
+--
+29.0025 RSS 1.08254e-09
+29.0048 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 29.0048
+--
+30.006 RSS 1.08254e-09
+30.0083 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 30.0083
+--
+31.0065 RSS 1.08254e-09
+31.0088 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 31.0088
+--
+32.0061 RSS 1.08254e-09
+32.0084 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 32.0084
+--
+33.0029 RSS 1.08254e-09
+33.0052 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 33.0052
+--
+34.0099 RSS 1.08254e-09
+34.0122 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 34.0122
+--
+35.0038 RSS 1.08254e-09
+35.0061 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 35.0061
+--
+36.0027 RSS 1.08254e-09
+36.005 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 36.005
+--
+37.0082 RSS 1.08254e-09
+37.0105 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 37.0105
+--
+38.0035 RSS 1.08254e-09
+38.0058 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 38.0058
+--
+39.0017 RSS 1.08254e-09
+39.004 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 39.004
+--
+40.004 RSS 1.08254e-09
+40.0063 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 40.0063
+--
+41.01 RSS 1.08254e-09
+41.0123 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 41.0123
+--
+42.0074 RSS 1.08254e-09
+42.0097 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 42.0097
+--
+43.0055 RSS 1.08254e-09
+43.0078 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 43.0078
+--
+44.0041 RSS 1.08254e-09
+44.0064 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 44.0064
+--
+45.0022 RSS 1.08254e-09
+45.0045 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 45.0045
+--
+46.0097 RSS 1.08254e-09
+46.012 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 46.012
+--
+46.112 RSS 1.10463e-09
+46.312 RSS 4.41361e-13
+46.512 RSS 1.10463e-09
+46.712 RSS 4.41361e-13
+46.912 RSS 1.10463e-09
+47.0037 RSS 1.08254e-09
+47.006 RSS 4.41361e-13
+47.006 PRSS 2.18673e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 47.006
+--
+47.106 RSS -1.10374e-09
+47.306 RSS 1.10463e-09
+47.506 RSS 4.41361e-13
+47.706 RSS 1.10463e-09
+47.906 RSS 4.41361e-13
+48.0037 RSS 1.08254e-09
+48.006 RSS 4.41361e-13
+48.006 PRSS 1.08254e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 48.006
+--
+48.106 RSS 1.10463e-09
+48.306 RSS 4.41361e-13
+48.506 RSS 1.10463e-09
+48.706 RSS 4.41361e-13
+48.906 RSS 1.10463e-09
+49.0046 RSS 1.08254e-09
+49.0069 RSS 4.41361e-13
+49.0069 PRSS 2.18673e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 49.0069
+--
+49.1069 RSS -1.10374e-09
+49.3069 RSS 1.10463e-09
+49.5069 RSS 4.41361e-13
+49.7069 RSS 1.10463e-09
+49.9069 RSS 4.41361e-13
+50.0055 RSS 1.08254e-09
+50.0078 RSS 4.41361e-13
+50.0078 PRSS 1.08254e-09
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 50.0078
+--
+51.0029 RSS 1.08254e-09
+51.0052 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 51.0052
+--
+52.0075 RSS 1.08254e-09
+52.0098 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 52.0098
+--
+53.0053 RSS 1.08254e-09
+53.0076 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 53.0076
+--
+54.0052 RSS 1.08254e-09
+54.0075 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 54.0075
+--
+55.0072 RSS 1.08254e-09
+55.0096 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 55.0096
+--
+56.007 RSS 1.08254e-09
+56.0093 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 56.0093
+--
+57.0057 RSS 1.08254e-09
+57.008 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 57.008
+--
+58.0058 RSS 1.08254e-09
+58.0082 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 58.0082
+--
+59.0084 RSS 1.08254e-09
+59.0107 RSS 4.41361e-13
+--
+Received one packet! Socket: 10.1.1.1 port: 49153 at time = 59.0107
+--
+Actual PDR = 1
+Actual RSS = 1.10463e-09
+Actual Average Packet RSS = 2.18673e-09

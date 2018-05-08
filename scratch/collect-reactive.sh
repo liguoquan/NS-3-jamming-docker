@@ -1,18 +1,19 @@
 #!/bin/bash
 cd ..
 
+#ReactiveJamming
 
-#NoJamming
-
-for distance in {1..1500..100}
+for disx in {0..15..1}
 do
-for interval in "0.01" "0.1" "0.2" "0.5" "0.8" "1" 
+for disy in {0..10..1}
+do
+for interval in "0.01" "0.1" "1" 
 do
     #echo "scratch/${distance}-${interval}"
     #./waf --run "scratch/test_none --i"
-    echo "distance:${distance}    interval:${interval}"
-    ./waf --run "scratch/test_none --distanceToRx=${distance} --interval=${interval}" > /dev/null
-    mv no.log "scratch/data/none-${distance}-${interval}.log"
+    echo "disx:${disx}    disy:${disy}    interval:${interval}"
+    ./waf --run "scratch/test_reactive --disx=${disx} --disy=${disy} --interval=${interval}" > /dev/null
+    mv reactive.log "scratch/data/reactive/reactive-${disx}-${disy}-${interval}.log"
 done
 done
-
+done

@@ -157,6 +157,7 @@ int main (int argc, char *argv[]){
   double interval = 1;          // seconds
   double startTime = 0.0;       // seconds
   double distanceToRx = 10.0;   // meters
+  double SystemLoss = 1.0;
   /*
    * This is a magic number used to set the transmit power, based on other
    * configuration.
@@ -173,6 +174,7 @@ int main (int argc, char *argv[]){
   cmd.AddValue ("verbose", "Turn on all device log components", verbose);
   cmd.AddValue ("interval", "interval", interval);
   cmd.AddValue ("display", "display", display);
+  cmd.AddValue ("SystemLoss", "SystemLoss", SystemLoss);
   cmd.Parse (argc, argv);
 
   // Convert to time object
@@ -212,8 +214,9 @@ int main (int argc, char *argv[]){
 
   /** wifi channel **/
   NslWifiChannelHelper wifiChannel;
-  wifiChannel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
-  wifiChannel.AddPropagationLoss ("ns3::FriisPropagationLossModel");
+  //wifiChannel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
+  wifiChannel.SetPropagationDelay ("ns3::RandomPropagationDelayModel");
+  wifiChannel.AddPropagationLoss ("ns3::FriisPropagationLossModel","SystemLoss",DoubleValue (SystemLoss));
   // create wifi channel
   Ptr<NslWifiChannel> wifiChannelPtr = wifiChannel.Create ();
   wifiPhy.SetChannel (wifiChannelPtr);
